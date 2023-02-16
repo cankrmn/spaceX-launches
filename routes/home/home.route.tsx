@@ -1,13 +1,119 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 
-const HomeRoute = () => {
+import { Props } from "../../stacks/native-stack/native-stack.types";
+import commonStyles from "../../utils/style.util";
+import { useState } from "react";
+import { formatDate } from "../../utils/date.util";
+import colors from "../../utils/color.util";
+
+const { width, height } = Dimensions.get("screen");
+
+const HomeRoute = ({ navigation }: Props<"Home">) => {
+	const [isPickerVisible, setIsPickerVisible] = useState<boolean>(false);
+	const [selectedDate, setSelectedDate] = useState<Date>();
+
+	const openPicker = () => {
+		setIsPickerVisible(true);
+	};
+
+	const closePicker = () => {
+		setIsPickerVisible(false);
+	};
+
+	const handleChangeDate = (event: DateTimePickerEvent, date?: Date) => {
+		const { type } = event;
+
+		switch (type) {
+			case "dismissed":
+				closePicker();
+				break;
+			case "set":
+				if (date) setSelectedDate(date);
+				break;
+			case "neutralButtonPressed":
+				console.log("neutralButtonPressed:", { event, date });
+				break;
+			default:
+				console.log("UNKNOWN TYPE:", { type });
+				break;
+		}
+	};
+
+	const handleSearch = () => {
+		if (selectedDate) {
+			navigation.navigate("Results", { date: selectedDate });
+			return;
+		}
+		// TODO: implement error handling!
+	};
+
 	return (
-		<View>
-			<Text>HomeRoute</Text>
-		</View>
+		<SafeAreaView style={[commonStyles.container, styles.container]}>
+			<StatusBar translucent={true} style="dark" />
+			<Text style={[styles.text_header, { paddingBottom: height * 0.05 }]}>Welcome</Text>
+			<Text style={[styles.text_large, { textAlign: "center" }]}>
+				Choose a date to see all the SpaceX launches on that day
+			</Text>
+			<Pressable onPress={openPicker} style={{ marginTop: height * 0.08 }}>
+				<TextInput
+					value={selectedDate ? formatDate(selectedDate) : undefined}
+					placeholder="dd/mm/yyyy"
+					style={[styles.textInput]}
+					editable={false}
+				/>
+			</Pressable>
+
+			<Pressable
+				style={[styles.search_button, { marginTop: height * 0.1 }]}
+				onPress={handleSearch}
+			>
+				<Text style={[styles.text_medium, { color: colors.white }]}>Search</Text>
+			</Pressable>
+
+			{isPickerVisible && (
+				<DateTimePicker value={selectedDate ?? new Date()} onChange={handleChangeDate} />
+			)}
+		</SafeAreaView>
 	);
 };
 
 export default HomeRoute;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+	container: {
+		alignItems: "center",
+		justifyContent: "center",
+		paddingHorizontal: width * 0.075,
+	},
+	text_header: {
+		fontWeight: "900",
+		fontSize: commonStyles.size[300],
+	},
+	text_large: {
+		fontWeight: "300",
+		fontSize: commonStyles.size[200],
+	},
+	text_medium: {
+		fontWeight: "600",
+		fontSize: commonStyles.size[200],
+	},
+	textInput: {
+		width: width * 0.36,
+		height: height * 0.036,
+		textAlign: "center",
+		backgroundColor: colors.white,
+		color: colors.black,
+		borderRadius: height * 0.012,
+	},
+	search_button: {
+		width: width * 0.5,
+		height: height * 0.06,
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: colors.blues[500],
+		borderRadius: height * 0.012,
+	},
+});
