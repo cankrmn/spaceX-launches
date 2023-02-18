@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, TextInput, View, Platform } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
@@ -10,6 +10,7 @@ import { formatDate } from "../../utils/date.util";
 import colors from "../../utils/color.util";
 
 const { width, height } = Dimensions.get("screen");
+const isAndroid = Platform.OS === "android";
 
 const HomeRoute = ({ navigation }: Props<"Home">) => {
 	const [isPickerVisible, setIsPickerVisible] = useState<boolean>(false);
@@ -28,7 +29,6 @@ const HomeRoute = ({ navigation }: Props<"Home">) => {
 
 		switch (type) {
 			case "dismissed":
-				closePicker();
 				break;
 			case "set":
 				if (date) setSelectedDate(date);
@@ -40,11 +40,12 @@ const HomeRoute = ({ navigation }: Props<"Home">) => {
 				console.log("UNKNOWN TYPE:", { type });
 				break;
 		}
+		closePicker();
 	};
 
 	const handleSearch = () => {
 		if (selectedDate) {
-			navigation.navigate("Results", { date: selectedDate });
+			navigation.navigate("Results", { date: selectedDate.toString() });
 			return;
 		}
 		// TODO: implement error handling!
@@ -57,25 +58,29 @@ const HomeRoute = ({ navigation }: Props<"Home">) => {
 			<Text style={[styles.text_large, { textAlign: "center" }]}>
 				Choose a date to see all the SpaceX launches on that day
 			</Text>
-			<Pressable onPress={openPicker} style={{ marginTop: height * 0.08 }}>
+			<View style={{ height: height * 0.05 }} />
+			{isAndroid && (
 				<TextInput
+					onPressIn={openPicker}
 					value={selectedDate ? formatDate(selectedDate) : undefined}
 					placeholder="dd/mm/yyyy"
 					style={[styles.textInput]}
 					editable={false}
 				/>
-			</Pressable>
-
+			)}
+			{(!isAndroid || isPickerVisible) && (
+				<DateTimePicker
+					display="calendar"
+					value={selectedDate ?? new Date()}
+					onChange={handleChangeDate}
+				/>
+			)}
 			<Pressable
-				style={[styles.search_button, { marginTop: height * 0.1 }]}
+				style={[styles.search_button, { marginTop: height * 0.05 }]}
 				onPress={handleSearch}
 			>
 				<Text style={[styles.text_medium, { color: colors.white }]}>Search</Text>
 			</Pressable>
-
-			{isPickerVisible && (
-				<DateTimePicker value={selectedDate ?? new Date()} onChange={handleChangeDate} />
-			)}
 		</SafeAreaView>
 	);
 };
