@@ -20,8 +20,22 @@ const NativeStack = () => {
 				}}
 			>
 				<Stack.Screen name="Home" component={HomeRoute} />
-				<Stack.Screen name="Results" component={ResultsRoute} />
-				<Stack.Screen name="Details" component={DetailsRoute} />
+				<Stack.Screen
+					name="Results"
+					component={ResultsRoute}
+					options={{
+						headerShown: true,
+						headerTitle: "",
+					}}
+				/>
+				<Stack.Screen
+					name="Details"
+					component={DetailsRoute}
+					options={{
+						headerShown: true,
+						headerTitle: "",
+					}}
+				/>
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
