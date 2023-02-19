@@ -60,13 +60,14 @@ const HomeRoute = ({ navigation }: Props<"Home">) => {
 			</Text>
 			<View style={{ height: height * 0.05 }} />
 			{isAndroid && (
-				<TextInput
-					onPressIn={openPicker}
-					value={selectedDate ? formatDate(selectedDate) : undefined}
-					placeholder="dd/mm/yyyy"
-					style={[styles.textInput]}
-					editable={false}
-				/>
+				<Pressable onPress={openPicker}>
+					<TextInput
+						value={selectedDate ? formatDate(selectedDate) : undefined}
+						placeholder="dd/mm/yyyy"
+						style={[styles.textInput]}
+						editable={false}
+					/>
+				</Pressable>
 			)}
 			{(!isAndroid || isPickerVisible) && (
 				<DateTimePicker
