@@ -25,7 +25,7 @@ const NativeStack = () => {
 					component={ResultsRoute}
 					options={{
 						headerShown: true,
-						headerTitle: "",
+						headerTitle: "Results",
 					}}
 				/>
 				<Stack.Screen
@@ -33,7 +33,7 @@ const NativeStack = () => {
 					component={DetailsRoute}
 					options={{
 						headerShown: true,
-						headerTitle: "",
+						headerTitle: "Details",
 					}}
 				/>
 			</Stack.Navigator>
