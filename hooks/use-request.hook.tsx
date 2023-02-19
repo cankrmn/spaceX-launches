@@ -1,10 +1,8 @@
-type FetchMethods = "GET" | "POST";
-
 interface UseRequestArgs {
-	url: string;
-	method?: FetchMethods;
 	date: Date;
 }
+
+const url = "https://api.spacexdata.com/v5/launches/query";
 
 const useRequest = () => {
 	// send request for getting the launches
@@ -12,14 +10,12 @@ const useRequest = () => {
 		"Content-Type": "application/json",
 	};
 
-	const request = async ({ url, method = "POST", date }: UseRequestArgs) => {
+	const request = async ({ date }: UseRequestArgs) => {
 		const dayStart = new Date(date);
 		dayStart.setUTCHours(0, 0, 0, 0);
 
 		const dayEnd = new Date(date);
 		dayEnd.setUTCHours(23, 59, 59, 999);
-
-		console.log({ dayStart, dayEnd });
 
 		const body = {
 			query: {
@@ -31,10 +27,19 @@ const useRequest = () => {
 		};
 
 		const res = await fetch(url, {
-			method,
+			method: "POST",
 			headers: _header,
 			body: JSON.stringify(body),
-		}).then((res) => res.json());
+		})
+			.then((res) => {
+				if (res.status === 200) return undefined;
+				return res.json();
+			})
+			.catch((err) => {
+				return err;
+			});
+
+		if (!res) return [];
 
 		return res["docs"] ?? [];
 	};
