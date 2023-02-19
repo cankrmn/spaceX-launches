@@ -25,37 +25,38 @@ const ContentToBeShown: {
 
 const { width, height } = Dimensions.get("screen");
 
-const DetailsRoute = ({ navigation, route }: Props<"Details">) => {
+const DetailsRoute = ({ route }: Props<"Details">) => {
 	const { launch } = route.params;
 
-	const {
-		name,
-		links: {
-			patch: { small },
-		},
-		date_utc,
-	} = launch;
+	const { name, links, date_utc } = launch;
+
+	const imageUrl = links?.patch?.small;
 
 	return (
 		<SafeAreaView edges={["bottom", "left", "right"]} style={[commonStyles.container]}>
-			<Header title={name} image={small} date={new Date(date_utc)} />
+			<Header title={name} image={imageUrl} date={date_utc ? new Date(date_utc) : undefined} />
 			<FlatList
 				contentContainerStyle={styles.content_wrapper}
 				data={ContentToBeShown}
 				renderItem={({ item }) => {
 					const { key, title, getValue } = item;
+					console.log({ title, val: launch[key] });
+					if (
+						!launch[key] ||
+						(Array.isArray(launch[key]) && !(launch[key] as any[])?.length)
+					) {
+						return <></>;
+					}
+
 					return (
-						<>
-							<Text style={styles.text_title}>
-								{title}:{" "}
-								<Text style={styles.text_content}>
-									{getValue ? getValue(launch[key]) : launch[key].toString()}
-								</Text>
+						<Text style={[styles.text_title, { marginBottom: height * 0.02 }]}>
+							{`${title}: `}
+							<Text style={styles.text_content}>
+								{getValue ? getValue(launch[key]) : launch[key]?.toString()}
 							</Text>
-						</>
+						</Text>
 					);
 				}}
-				ItemSeparatorComponent={() => <View style={{ height: height * 0.02 }} />}
 			/>
 		</SafeAreaView>
 	);

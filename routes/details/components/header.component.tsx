@@ -2,26 +2,32 @@ import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import colors from "../../../utils/color.util";
 
 interface HeaderArgs {
-	image: string;
-	title: string;
-	date: Date;
+	title?: string;
+	image?: string;
+	date?: Date;
 }
 
 const { width, height } = Dimensions.get("screen");
 
-const Header = ({ image, title, date }: HeaderArgs) => {
+const Header = ({ title, image, date }: HeaderArgs) => {
 	return (
 		<View style={styles.container}>
-			<Image
-				source={{ uri: image }}
-				style={{ aspectRatio: 1, height: "80%", marginRight: width * 0.02 }}
-			/>
+			{image && (
+				<Image
+					source={{ uri: image }}
+					style={{ aspectRatio: 1, height: "80%", marginRight: width * 0.02 }}
+				/>
+			)}
 			<View style={{ marginLeft: width * 0.03 }}>
-				<Text style={styles.text_header}>{title}</Text>
-				<View style={{ height: height * 0.005 }} />
-				<Text style={styles.text_small}>{`${date.toDateString()} ${date
-					.toLocaleTimeString()
-					.slice(0, date.toLocaleTimeString().lastIndexOf(":"))}`}</Text>
+				{title && <Text style={styles.text_header}>{title}</Text>}
+				{date && (
+					<>
+						<View style={{ height: height * 0.005 }} />
+						<Text style={styles.text_small}>{`${date?.toDateString()} ${date
+							?.toLocaleTimeString()
+							.slice(0, date?.toLocaleTimeString().lastIndexOf(":"))}`}</Text>
+					</>
+				)}
 			</View>
 		</View>
 	);
